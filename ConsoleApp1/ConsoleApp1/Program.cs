@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
+using static ConsoleApp1.Item;
 
 namespace ConsoleApp1
 {
@@ -11,13 +12,13 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            //아이템 데이터 불러오기.
-            ItemData.ItemDataMade();
+            DrawTopAndBottomBorders(40);
             //플레이어 데이터 체크, 불러오기.
             string filePath = "playerData.json";
+            string itemDataPath = "itemData.json";
             Player loadedPlayer = LoadPlayerData(filePath) ?? player;
 
-            if(loadedPlayer.Name == "null")// 사전에 저장된 데이터가 없는 경우.
+            if (loadedPlayer.Name == "null")// 사전에 저장된 데이터가 없는 경우.
             {
                 currentStage = 1;//이름 설정 시작.
                 Console.Clear();
@@ -26,9 +27,16 @@ namespace ConsoleApp1
             {
                 Console.WriteLine("이전에 저장된 데이터가 있습니다. 불러오시겠습니까? (Y/N)");
                 string? answer = Console.ReadLine();
-                if(answer == "Y"|| answer == "y")
+                if (answer == "Y" || answer == "y")
                 {
-                    player = loadedPlayer;
+                    player = loadedPlayer;//플레이어 데이터 불러오기
+                    if (File.Exists(itemDataPath))
+                    {
+                        var itemsDatas = JsonSerializer.Deserialize<List<Item>>(File.ReadAllText(itemDataPath));
+                        if (itemsDatas != null)
+                            ItemData.items = itemsDatas;//아이템 데이터 불러오기(구매한 시간...)
+                    }
+                    //아이템 값 로드.
                     currentStage = 3; //데이터 불러오고 메인 로비 시작.
                     Console.Clear();
                 }
@@ -48,6 +56,7 @@ namespace ConsoleApp1
             //게임 실행
             while (true)
             {
+                DrawTopAndBottomBorders(40);
                 switch (currentStage) // 1~11까지의 커스텀 ui.
                 {
                     case 0://데이터 불러오기 단계.
@@ -74,16 +83,18 @@ namespace ConsoleApp1
                         Inventory(player);
                         break;
                     case 6:
-                        //장착 관리
                         break;
                     case 7:
                         //상점
+                        Shop(player);
                         break;
                     case 8:
-                        //아이템 구매
+                        //아이템 구매]
+                        ShopBuy(player);
                         break;
                     case 9:
                         //아이템 판매
+                        ShopSell(player);
                         break;
                     case 10:
                         //던전 입장
@@ -144,7 +155,8 @@ namespace ConsoleApp1
                 default:
                     Console.Clear();
                     Console.WriteLine("잘못된 입력입니다.");
-                    SetPlayerJob(player);
+                    Console.WriteLine("");
+                    //SetPlayerJob(player);
                     break;
             }
             currentStage = 3;
@@ -186,12 +198,13 @@ namespace ConsoleApp1
                     Console.Clear();
                     break;
                 case "6":
-                    SavePlayerData(player, "playerData.json");
+                    SavePlayerData(player, "playerData.json", "itemData.json");//플레이어+아이템 데이터 저장.
                     Environment.Exit(0);
                     break;
                 default:
                     Console.Clear();
                     Console.WriteLine("잘못된 입력입니다.");
+                    Console.WriteLine("");
                     MainLobby(player);
                     break;
             }
@@ -219,47 +232,265 @@ namespace ConsoleApp1
             {
                 Console.Clear();
                 Console.WriteLine("잘못된 입력입니다.");
-                PlayerStatus(player);
+                Console.WriteLine("");
+                //PlayerStatus(player);
             }
         }
         static void Inventory(Player player)
         {
             Console.WriteLine("[아이템 목록]");
-            for(int i =0; i < player.Inven.Count; i++)
+            for (int i = 0; i < player.Inven.Count; i++)
             {
-                Console.WriteLine($"- {i+1} {player.Inven[i].EquipString()}{player.Inven[i].Name}   |  {player.Inven[i].ReturnInfo()}   |  {player.Inven[i].Description}");
+                Console.WriteLine($"- {i + 1} {player.Inven[i].EquipString()}{player.Inven[i].Name}   |  {player.Inven[i].ReturnInfo()}   |  {player.Inven[i].Description}");
             }
             Console.WriteLine("");
             Console.WriteLine("0. 나가기");
-            ConReadLine() ;
+            ConReadLine();
             string? input = Console.ReadLine();
-            if (input == "0") { currentStage = 3;}
+            if (input == "0") { currentStage = 3; Console.Clear(); }
             else
             {
-                if(int.TryParse(input,out int num))//정수값 입력시
+                if (player.Inven.Count == 0)
                 {
-                    if(num >= 1 || num <= player.Inven.Count)//범위내의 값을 입력시
+                    Console.Clear();
+                    Console.WriteLine("잘못된 입력입니다.");
+                    Console.WriteLine("");
+                    //Inventory(player);
+                }//인벤토리에 아무것도 들어있지 않을시
+                if (int.TryParse(input, out int num))//정수값 입력시
+                {
+                    if (num >= 1 && num <= player.Inven.Count)//범위내의 값을 입력시
                     {
-                        player.EquipTry(player.Inven[num]); //장착or해제
+                        player.EquipTry(player.Inven[num - 1]); //장착or해제
                         Console.Clear();
-                        Inventory(player);
+                        //Inventory(player);
                     }
                     else//범위밖의 값을 입력시
                     {
                         Console.Clear();
                         Console.WriteLine("잘못된 입력입니다.");
-                        Inventory(player);
+                        Console.WriteLine("");
+                        //Inventory(player);
                     }
                 }
                 else//정수값이 아닌값을 입력시
                 {
                     Console.Clear();
                     Console.WriteLine("잘못된 입력입니다.");
-                    Inventory(player);
+                    Console.WriteLine("");
+                    //Inventory(player);
+                }
+            }
+        }
+        static void Shop(Player player)
+        {
+            Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
+            Console.WriteLine("");
+            Console.WriteLine("[보유 골드]");
+            Console.WriteLine($"{player.Gold} G");
+            Console.WriteLine("");
+            Console.WriteLine("[아이템 목록]");
+            for (int i = 0; i < ItemData.items?.Count; i++)//샵 아이템 데이터 for문.
+            {
+                Console.WriteLine($"- {ItemData.items?[i].Name}   |  {ItemData.items?[i].ReturnInfo()}   |  {ItemData.items?[i].Description}   |  {CheckBought(player, ItemData.items?[i])}");
+            }
+            Console.WriteLine("");
+            Console.WriteLine("0. 나가기");
+            Console.WriteLine("1. 아이템 구매");
+            Console.WriteLine("2. 아이템 판매");
+            ConReadLine();
+            string? input = Console.ReadLine();
+            switch (input)
+            {
+                case "0":
+                    currentStage = 3;
+                    Console.Clear();
+                    break;
+                case "1":
+                    currentStage = 8;
+                    Console.Clear();
+                    break;
+                case "2":
+                    currentStage = 9;
+                    Console.Clear();
+                    break;
+                default:
+                    Console.Clear();
+                    Console.WriteLine("잘못된 입력입니다.");
+                    Console.WriteLine("");
+                    break;
+            }
+        }
+        static void ShopBuy(Player player)
+        {
+            Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
+            Console.WriteLine("");
+            Console.WriteLine("[보유 골드]");
+            Console.WriteLine($"{player.Gold} G");
+            Console.WriteLine("");
+            Console.WriteLine("[아이템 목록]");
+            for (int i = 0; i < ItemData.items?.Count; i++)//샵 아이템 데이터 for문.
+            {
+                Console.WriteLine($"- {i + 1} {ItemData.items?[i].Name}   |  {ItemData.items?[i].ReturnInfo()}   |  {ItemData.items?[i].Description}   |  {CheckBought(player, ItemData.items?[i])}");
+            }
+            Console.WriteLine("");
+            Console.WriteLine("0. 나가기");
+            Console.WriteLine($"1~{ItemData.items?.Count + 1}. 구매하기");
+            ConReadLine();
+            string? input = Console.ReadLine();
+            if (input == "0") { currentStage = 7; Console.Clear(); }//상점 화면으로 돌아가기.
+            else
+            {
+                if (int.TryParse(input, out int num))//정수값 입력시
+                {
+                    if (num >= 1 && num <= ItemData.items?.Count)//범위내의 값을 입력시
+                    {
+                        //구매함수 작동 (이미구매상태//금액충분구매//금액부족구매)
+                        Console.Clear();
+                        TryBuy(player, ItemData.items[num - 1]);
+                        //ShopBuy(player);
+                    }
+                    else//범위밖의 값을 입력시
+                    {
+                        Console.Clear();
+                        Console.WriteLine("잘못된 입력입니다.");
+                        Console.WriteLine("");
+                        //ShopBuy(player);
+                    }
+                }
+                else//정수값이 아닌값을 입력시
+                {
+                    Console.Clear();
+                    Console.WriteLine("잘못된 입력입니다.");
+                    Console.WriteLine("");
+                    //ShopBuy(player);
+                }
+            }
+        }
+        static void ShopSell(Player player)//여기서 나가기 >> current =7
+        {
+            Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
+            Console.WriteLine("");
+            Console.WriteLine("[보유 골드]");
+            Console.WriteLine($"{player.Gold} G");
+            Console.WriteLine("");
+            Console.WriteLine("[아이템 목록]");
+            for (int i = 0; i < player.Inven.Count; i++)
+            {
+                Console.WriteLine($"- {i + 1} {player.Inven[i].EquipString()}{player.Inven[i].Name}   |  {player.Inven[i].ReturnInfo()}   |  {player.Inven[i].Description}   |  {player.Inven[i].Gold} G");
+            }
+            Console.WriteLine("");
+            Console.WriteLine("0. 나가기");
+            if (player.Inven.Count > 0)
+                Console.WriteLine($"1~{ItemData.items?.Count + 1}. 판매하기");
+            ConReadLine();
+            string? input = Console.ReadLine();
+            if (input == "0") { currentStage = 7; Console.Clear(); }//상점 화면으로 돌아가기.
+            else
+            {
+                if (player.Inven.Count == 0)
+                {
+                    Console.Clear();
+                    Console.WriteLine("잘못된 입력입니다.");
+                    Console.WriteLine("");
+                    ShopSell(player);
+                }//인벤토리에 아무것도 들어있지 않을시
+                if (int.TryParse(input, out int num))//정수값 입력시
+                {
+                    if (num >= 1 && num <= player.Inven.Count)//범위내의 값을 입력시
+                    {
+                        //판매함수 작동(아
+                        Console.Clear();
+                        TrySell(player, num - 1);
+                        ShopSell(player);
+                    }
+                    else//범위밖의 값을 입력시
+                    {
+                        Console.Clear();
+                        Console.WriteLine("잘못된 입력입니다.");
+                        Console.WriteLine("");
+                        ShopSell(player);
+                    }
+                }
+                else//정수값이 아닌값을 입력시
+                {
+                    Console.Clear();
+                    Console.WriteLine("잘못된 입력입니다.");
+                    Console.WriteLine("");
+                    ShopSell(player);
                 }
             }
         }
 
+        static void TryBuy(Player player, Item itemDT)
+        {
+            //구매함수 작동(이미구매상태//금액충분구매//금액부족구매)
+            Item? item = player.Inven.FirstOrDefault(x => x.Name == itemDT.Name);//플레이어의 인벤에 있는 아이템에 접근, itemDT의 아이템과 동일한게 있으면 item에 저장.
+            if (item != null)
+            {
+                //플레이어의 인벤에 동일한 아이템 존재
+                Console.WriteLine("이미 구매한 아이템입니다.");
+            }
+            else
+            {
+                //플레이어의 인벤에 없는 아이템 + 구매 시도
+                if (itemDT.Gold <= player.Gold)
+                {
+                    //구매가 가능한 금액(재화 감소//인벤토리에 아이템추가)
+                    player.Gold -= itemDT.Gold;
+                    player.Inven.Add(itemDT);
+                    itemDT.PurchasedTime = DateTime.Now;
+                    Console.WriteLine("구매를 완료했습니다.");
+
+                }
+                else
+                {
+                    //구매가 불가능한 금액 
+                    Console.WriteLine("Gold가 부족합니다.");
+                }
+            }
+        }
+        static void TrySell(Player player, int index)
+        {
+            Item item = player.Inven[index];
+
+            if (item.isEquipped)
+            {
+                if (item.Type == ItemType.weapon)
+                    player.Attack -= item.Value;
+                else if (item.Type == ItemType.armor)
+                    player.Defense -= item.Value;
+                else if (item.Type == ItemType.acc)
+                {
+                    player.Attack -= item.Value;
+                    player.Defense -= item.Value2;
+                }
+                else
+                { Console.WriteLine("아이템 판매중 오류가 발생하였습니다."); }
+            }//장칙중인 아이템을 판매시(능력치 반환) 
+            TimeSpan timeDif = DateTime.Now - item.PurchasedTime;
+            float fixedPricee = (1 - ((float)timeDif.TotalSeconds) / 3600);
+            if (fixedPricee < 0)
+                fixedPricee = 0;
+            player.Gold += (int)(item.Gold * fixedPricee);//1시간 기준으로 100% ~ 0%의 금액으로 재판매 가능.
+            Console.WriteLine($"{item.Name}을(를) {timeDif.TotalHours}시간이 지나, {fixedPricee * 100}%의 금액에 판매하였습니다.{timeDif.TotalSeconds}초경과,테스트");
+            player.Inven.Remove(item);//아이템 제거.
+        }
+        static string CheckBought(Player player, Item? itemDT)
+        {
+            Item? item = player.Inven.FirstOrDefault(x => x.Name == itemDT?.Name);//만약 플레이어의 인벤에 있는 아이템에 접근시...
+            if (item?.Name != null)
+            {
+                //플레이어의 인벤에 동일한 아이템 존재
+                return $"1{item?.Name}구매완료";
+            }
+            else
+            {
+                //플레이어의 인벤에 없는 아이템
+                return $"{itemDT?.Gold} G";
+            }
+
+        }
         static void ConReadLine()
         {
             Console.WriteLine("");
@@ -267,10 +498,12 @@ namespace ConsoleApp1
             Console.Write(">> ");
         }
 
-        static void SavePlayerData(Player player, string filePath)//게임 종료시 플레이어 데이터 저장. SavePlayerData(loadedPlayer, filePath);
+        static void SavePlayerData(Player player, string filePath, string itemData)//게임 종료시 플레이어 데이터 저장. SavePlayerData(loadedPlayer, filePath);
         {
             string json = JsonSerializer.Serialize(player);
-            File.WriteAllText(filePath, json);
+            string json2 = JsonSerializer.Serialize(itemData);
+            File.WriteAllText(filePath, json);//플레이어 데이터 저장
+            File.WriteAllText(itemData, json2);//아이템 데이터 저장
         }
         static Player? LoadPlayerData(string filePath)//처음 시작하는 경우 파일이 없을 수 있기에 null 허용.
         {
@@ -285,6 +518,41 @@ namespace ConsoleApp1
             }
 
         }
+        static List<Item>? LoadItemData(string itemData)
+        {
+            if (File.Exists(itemData)) //파일이 존재
+            {
+                string json = File.ReadAllText(itemData);
+                return JsonSerializer.Deserialize<List<Item>>(json);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        static void DrawTopAndBottomBorders(int width)//여기에 레벨, 이름 (직업), 체력, 던전 클리어 횟수 등의 간단한 정보 표시.
+        {
+            // 상단 테두리 그리기
+            Console.Write("+");
+            for (int i = 0; i < width - 2; i++)
+            {
+                Console.Write("-");
+            }
+            Console.WriteLine("+");
 
+            // 중앙 빈 공간 출력
+            for (int i = 0; i < 5; i++) // 5줄의 빈 줄을 출력 (원하는 줄 수로 변경 가능)
+            {
+                Console.WriteLine();
+            }
+
+            // 하단 테두리 그리기
+            Console.Write("+");
+            for (int i = 0; i < width - 2; i++)
+            {
+                Console.Write("-");
+            }
+            Console.WriteLine("+");
+        }
     }
 }

@@ -8,15 +8,17 @@ namespace ConsoleApp1
 {
     class Player
     {
-        public int Level { get; set; }
-        public string? Name { get; set; }
-        public Job? Job { get; set; }
-        public int Score { get; set; }
-        public int Attack { get; set; }
-        public int Defense { get; set; }
-        public int Health { get; set; }
-        public int MaxHealth { get; set; }
-        public int Gold { get; set; }
+        public int Level;
+        public string? Name;
+        public Job? Job;
+        public int Score;
+        public int Attack;
+        public int Defense;
+        public int Health;
+        public int MaxHealth;
+        public int Gold;
+
+        public int DungeonClearCount;
 
         public List<Item> Inven;
 
@@ -31,6 +33,7 @@ namespace ConsoleApp1
             Health = 100;
             MaxHealth = 100;
             Gold = 1500;
+            DungeonClearCount = 0;
             Inven = new List<Item>();
         }
 

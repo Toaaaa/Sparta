@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +10,7 @@ namespace ConsoleApp1
 {
     public struct Item
     {
-        public Item(string? name,int typenum ,int value, string disc, int gold)
+        public Item(string? name, int typenum, int value, string disc, int gold)
         {
             Name = name;
             Type = (ItemType)typenum;
@@ -16,7 +18,7 @@ namespace ConsoleApp1
             Description = disc;
             Gold = gold;
         }
-        public Item(string? name,int typenum ,int value,int value2, string disc, int gold)//acc 생성자
+        public Item(string? name, int typenum, int value, int value2, string disc, int gold)//acc 생성자
         {
             Name = name;
             Type = (ItemType)typenum;
@@ -38,7 +40,19 @@ namespace ConsoleApp1
         public int Value2 { get; set; }//acc만 사용하는 2번째 능력치.
         public string Description { get; set; }
         public int Gold { get; set; }
+        public DateTime PurchasedTime { get; set; }
         public bool isEquipped;
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Item other = (Item)obj;
+            return Name == other.Name && Type == other.Type && Gold == other.Gold;
+        }
 
         public string EquipString()
         {
