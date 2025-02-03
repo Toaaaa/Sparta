@@ -10,7 +10,6 @@ namespace ConsoleApp1
 {
     public struct Item
     {
-        public Item() { }
         public Item(string? name, int typenum, int value, string disc, int gold)
         {
             Name = name;

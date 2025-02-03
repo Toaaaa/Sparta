@@ -156,7 +156,6 @@ namespace ConsoleApp1
                     Console.Clear();
                     Console.WriteLine("잘못된 입력입니다.");
                     Console.WriteLine("");
-                    //SetPlayerJob(player);
                     break;
             }
         }
@@ -261,14 +260,12 @@ namespace ConsoleApp1
                     {
                         player.EquipTry(num - 1); //장착or해제
                         Console.Clear();
-                        //Inventory(player);
                     }
                     else//범위밖의 값을 입력시
                     {
                         Console.Clear();
                         Console.WriteLine("잘못된 입력입니다.");
                         Console.WriteLine("");
-                        //Inventory(player);
                     }
                 }
                 else//정수값이 아닌값을 입력시
@@ -276,7 +273,6 @@ namespace ConsoleApp1
                     Console.Clear();
                     Console.WriteLine("잘못된 입력입니다.");
                     Console.WriteLine("");
-                    //Inventory(player);
                 }
             }
         }
@@ -346,14 +342,12 @@ namespace ConsoleApp1
                         //구매함수 작동 (이미구매상태//금액충분구매//금액부족구매)
                         Console.Clear();
                         TryBuy(player, ItemData.items[num - 1]);
-                        //ShopBuy(player);
                     }
                     else//범위밖의 값을 입력시
                     {
                         Console.Clear();
                         Console.WriteLine("잘못된 입력입니다.");
                         Console.WriteLine("");
-                        //ShopBuy(player);
                     }
                 }
                 else//정수값이 아닌값을 입력시
@@ -361,7 +355,6 @@ namespace ConsoleApp1
                     Console.Clear();
                     Console.WriteLine("잘못된 입력입니다.");
                     Console.WriteLine("");
-                    //ShopBuy(player);
                 }
             }
         }
