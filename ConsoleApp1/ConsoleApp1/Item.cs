@@ -10,6 +10,7 @@ namespace ConsoleApp1
 {
     public struct Item
     {
+        public Item() { }
         public Item(string? name, int typenum, int value, string disc, int gold)
         {
             Name = name;
@@ -41,18 +42,8 @@ namespace ConsoleApp1
         public string Description { get; set; }
         public int Gold { get; set; }
         public DateTime PurchasedTime { get; set; }
-        public bool isEquipped;
+        public bool isEquipped{ get; set; }//착용 여부
 
-        public override bool Equals(object? obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-
-            Item other = (Item)obj;
-            return Name == other.Name && Type == other.Type && Gold == other.Gold;
-        }
 
         public string EquipString()
         {
