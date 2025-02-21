@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj": {}
+    "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\Code\\Code\\Code.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj": {
+    "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\Code\\Code\\Code.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
-        "projectName": "ConsoleApp1",
-        "projectPath": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+        "projectUniqueName": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\Code\\Code\\Code.csproj",
+        "projectName": "Code",
+        "projectPath": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\Code\\Code\\Code.csproj",
         "packagesPath": "C:\\Users\\nate\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\ConsoleApp1\\ConsoleApp1\\obj\\",
+        "outputPath": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\Code\\Code\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

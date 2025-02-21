@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
-      "projectName": "ConsoleApp1",
-      "projectPath": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\ConsoleApp1\\ConsoleApp1\\ConsoleApp1.csproj",
+      "projectUniqueName": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\Code\\code\\code\\code.csproj",
+      "projectName": "code",
+      "projectPath": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\Code\\code\\code\\code.csproj",
       "packagesPath": "C:\\Users\\nate\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\ConsoleApp1\\ConsoleApp1\\obj\\",
+      "outputPath": "C:\\Users\\nate\\source\\repos\\Github\\Sparta\\Sparta\\Code\\code\\code\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
