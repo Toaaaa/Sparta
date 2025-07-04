@@ -7,39 +7,34 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/12927
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/12921
         /// </summary>
 
         public class Solution
         {
-            public long solution(int n, int[] works)
+            public int solution(int n)
             {
-                if(n >= works.Sum()) return 0; // 모든 작업을 완료할 수 있는 경우, 0 반환
+                if (n < 2) return 0;
 
-                while (n > 0)
+                bool[] isPrime = new bool[n + 1];
+                for (int i = 2; i <= n; i++) isPrime[i] = true;
+
+                for (int i = 2; i * i <= n; i++)
                 {
-                    int max = works.Max();
-                    if (max == 0) break; // 모든 작업이 완료된 경우
+                    if (!isPrime[i]) continue;
 
-                    works = DecreaseMax(max, works);
-                    n--;
+                    for (int j = i * i; j <= n; j += i)
+                    {
+                        isPrime[j] = false;
+                    }
                 }
 
-                long answer = 0;
-                for(int i = 0; i < works.Length; i++)
+                int answer = 0;
+                for (int i = 2; i <= n; i++)
                 {
-                    answer += (long)Math.Pow(works[i], 2); // 오버플로우 방지 long 캐스팅
+                    if (isPrime[i]) answer++;
                 }
                 return answer;
-            }
-
-            public int[] DecreaseMax(int max,int[] work)
-            {
-                int index = Array.IndexOf(work, max);
-
-                work[index] = max - 1;
-
-                return work;
             }
         }
     }
