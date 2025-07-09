@@ -7,30 +7,40 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/87390
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/181881
         /// </summary>
 
         public class Solution
         {
-            public int[] solution(int n, long left, long right)
+            public int solution(int[] arr)
             {
-                int length = (int)(right - left + 1); // right - left 는 10^5 보다 작아서 int 변환 가능.
-                int[] answer = new int[length];
+                int answer = 0;
+                int[] arr2 = new int[arr.Length];
+                arr2 = (int[])arr.Clone();
 
-                for (int i = 0; i < length; i++)
-                {              
-                    answer[i] = GetValue(n, left + i);
+                while(true)
+                {
+                    answer++;
+                    arr2 = (int[])arr.Clone();
+
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        if (arr[i] >= 50 && arr[i] % 2 == 0)
+                        {
+                            arr[i] = arr[i] / 2;
+                        }
+                        else if (arr[i] < 50 && arr[i] % 2 != 0)
+                        {
+                            arr[i] = arr[i] * 2 + 1;
+                        }
+                    }
+
+                    if (arr.SequenceEqual(arr2))
+                        break;
                 }
-                return answer;
-            }
-            public int GetValue(int n, long index)
-            {
-                long row = index / n;
-                long col = index % n;
 
-                return (int)Math.Max(row, col) + 1;
+                return answer - 1 ;
             }
-
         }
     }
 }
