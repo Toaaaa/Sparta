@@ -21,7 +21,8 @@ namespace code
                 int endTime = GetTime(op_end);
                 int posTime = GetTime(pos);
 
-                if (IsBetween(startTime, endTime, posTime)) pos = op_end;
+                if (IsBetween(startTime, endTime, posTime)) posTime = endTime;
+
                 foreach (var command in commands)
                 {
                     if(command == "next")
@@ -34,8 +35,8 @@ namespace code
                     }
 
                     if(posTime < 0) posTime = 0; // 시간이 음수일 때는 0으로 초기화
-                    if (IsBetween(startTime, endTime, GetTime(pos))) pos = op_end; // 스킵 구간 일때
-                    if(posTime >= videoTime) pos = video_len; // 영상 끝에 도달했을 때
+                    if (IsBetween(startTime, endTime, posTime)) posTime = endTime; // 스킵 구간 일때
+                    if(posTime >= videoTime) posTime = videoTime; // 영상 끝에 도달했을 때
                 }
 
                 return ToTime(posTime);
@@ -50,8 +51,8 @@ namespace code
             public int GetTime(string time)
             {
                 var times = time.Split(':');
-                int minute = int.Parse(times[1]);
-                int second = int.Parse(times[2]);
+                int minute = int.Parse(times[0]);
+                int second = int.Parse(times[1]);
 
                 return  minute * 60 + second;
             }
