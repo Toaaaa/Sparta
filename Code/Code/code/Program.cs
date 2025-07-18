@@ -8,62 +8,60 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/340212
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/340213
         /// </summary>
 
         public class Solution
         {
-            public long GetTotalTime(int level, int[] diffs, int[] times, long limit)
+            public string solution(string video_len, string pos, string op_start, string op_end, string[] commands)
             {
-                long totalTime = 0;
-                for (int i = 0; i < diffs.Length; i++)
-                {
-                    int curTime = times[i];
-                    int prevTime = (i == 0) ? 0 : times[i - 1];
+                // 시작전 스킵 체크
+                int videoTime = GetTime(video_len);
+                int startTime = GetTime(op_start);
+                int endTime = GetTime(op_end);
+                int posTime = GetTime(pos);
 
-                    if (diffs[i] <= level)
+                if (IsBetween(startTime, endTime, posTime)) pos = op_end;
+                foreach (var command in commands)
+                {
+                    if(command == "next")
                     {
-                        totalTime += curTime;
+                        posTime += 10;
                     }
                     else
                     {
-                        int mistakes = diffs[i] - level;
-                        totalTime += (long)(curTime + prevTime) * mistakes + curTime;
+                        posTime -= 10;
                     }
 
-                    // limit 를 초과시 조기 종료
-                    if (totalTime > limit)
-                        return totalTime;
+                    if(posTime < 0) posTime = 0; // 시간이 음수일 때는 0으로 초기화
+                    if (IsBetween(startTime, endTime, GetTime(pos))) pos = op_end; // 스킵 구간 일때
+                    if(posTime >= videoTime) pos = video_len; // 영상 끝에 도달했을 때
                 }
 
-                return totalTime;
+                return ToTime(posTime);
             }
 
-            public int solution(int[] diffs, int[] times, long limit)
+            public bool IsBetween(int start, int end, int pos)
             {
-                int left = 1;
-                int right = 100000;
-                int answer = right;
-
-                while (left <= right)
-                {
-                    int mid = (left + right) / 2;
-                    long totalTime = GetTotalTime(mid, diffs, times, limit);
-
-                    if (totalTime <= limit)
-                    {
-                        answer = mid;
-                        right = mid - 1;
-                    }
-                    else
-                    {
-                        left = mid + 1;
-                    }
-                }
-
-                return answer;
+                if(start <= pos && pos <= end) return true;
+                else return false;
             }
 
+            public int GetTime(string time)
+            {
+                var times = time.Split(':');
+                int minute = int.Parse(times[1]);
+                int second = int.Parse(times[2]);
+
+                return  minute * 60 + second;
+            }
+            public string ToTime(int time)
+            {
+                int minute = time / 60;
+                int second = time % 60;
+
+                return $"{minute:D2}:{second:D2}";
+            }
         }
     }
 }
