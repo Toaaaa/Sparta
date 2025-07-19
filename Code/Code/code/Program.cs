@@ -8,60 +8,57 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/340213
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/258712
         /// </summary>
 
         public class Solution
         {
-            public string solution(string video_len, string pos, string op_start, string op_end, string[] commands)
+            public int solution(string[] friends, string[] gifts)
             {
-                // 시작전 스킵 체크
-                int videoTime = GetTime(video_len);
-                int startTime = GetTime(op_start);
-                int endTime = GetTime(op_end);
-                int posTime = GetTime(pos);
+                int n = friends.Length;
+                Dictionary<string, int> nameToIndex = new();
+                for (int i = 0; i < n; i++) nameToIndex[friends[i]] = i;
 
-                if (IsBetween(startTime, endTime, posTime)) posTime = endTime;
+                int[,] giveCount = new int[n, n];
+                int[] giveTotal = new int[n];
+                int[] receiveTotal = new int[n];
 
-                foreach (var command in commands)
+                foreach (var gift in gifts)
                 {
-                    if(command == "next")
-                    {
-                        posTime += 10;
-                    }
-                    else
-                    {
-                        posTime -= 10;
-                    }
+                    var parts = gift.Split(' ');
+                    int giver = nameToIndex[parts[0]];
+                    int receiver = nameToIndex[parts[1]];
 
-                    if(posTime < 0) posTime = 0; // 시간이 음수일 때는 0으로 초기화
-                    if (IsBetween(startTime, endTime, posTime)) posTime = endTime; // 스킵 구간 일때
-                    if(posTime >= videoTime) posTime = videoTime; // 영상 끝에 도달했을 때
+                    giveCount[giver, receiver]++;
+                    giveTotal[giver]++;
+                    receiveTotal[receiver]++;
                 }
 
-                return ToTime(posTime);
-            }
+                int[] giftIndex = new int[n];
+                for (int i = 0; i < n; i++)
+                    giftIndex[i] = giveTotal[i] - receiveTotal[i];
 
-            public bool IsBetween(int start, int end, int pos)
-            {
-                if(start <= pos && pos <= end) return true;
-                else return false;
-            }
+                int[] nextMonthGifts = new int[n];
 
-            public int GetTime(string time)
-            {
-                var times = time.Split(':');
-                int minute = int.Parse(times[0]);
-                int second = int.Parse(times[1]);
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (i == j) continue;
 
-                return  minute * 60 + second;
-            }
-            public string ToTime(int time)
-            {
-                int minute = time / 60;
-                int second = time % 60;
+                        if (giveCount[i, j] > giveCount[j, i])
+                        {
+                            nextMonthGifts[i]++;
+                        }
+                        else if (giveCount[i, j] == giveCount[j, i])
+                        {
+                            if (giftIndex[i] > giftIndex[j])
+                                nextMonthGifts[i]++;
+                        }
+                    }
+                }
 
-                return $"{minute:D2}:{second:D2}";
+                return nextMonthGifts.Max();
             }
         }
     }
