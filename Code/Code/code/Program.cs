@@ -8,58 +8,73 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/258712
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/388351
         /// </summary>
 
         public class Solution
         {
-            public int solution(string[] friends, string[] gifts)
+            public int solution(int[] schedules, int[,] timelogs, int startday)
             {
-                int n = friends.Length;
-                Dictionary<string, int> nameToIndex = new();
-                for (int i = 0; i < n; i++) nameToIndex[friends[i]] = i;
+                int answer = 0;
+                bool[] late = new bool[schedules.Length];
 
-                int[,] giveCount = new int[n, n];
-                int[] giveTotal = new int[n];
-                int[] receiveTotal = new int[n];
-
-                foreach (var gift in gifts)
+                // schedules HHMM -> 분 변환
+                for (int i = 0; i < schedules.Length; i++)
                 {
-                    var parts = gift.Split(' ');
-                    int giver = nameToIndex[parts[0]];
-                    int receiver = nameToIndex[parts[1]];
-
-                    giveCount[giver, receiver]++;
-                    giveTotal[giver]++;
-                    receiveTotal[receiver]++;
+                    schedules[i] = GetTime(schedules[i]);
                 }
 
-                int[] giftIndex = new int[n];
-                for (int i = 0; i < n; i++)
-                    giftIndex[i] = giveTotal[i] - receiveTotal[i];
-
-                int[] nextMonthGifts = new int[n];
-
-                for (int i = 0; i < n; i++)
+                // timelogs HHMM -> 분 변환
+                for (int i = 0; i < timelogs.GetLength(0); i++)
                 {
-                    for (int j = 0; j < n; j++)
+                    int[] row = GetRow(timelogs, i);
+                    for (int j = 0; j < row.Length; j++)
                     {
-                        if (i == j) continue;
+                        timelogs[i, j] = GetTime(row[j]);
+                    }
+                }
 
-                        if (giveCount[i, j] > giveCount[j, i])
+                for (int i = 0; i < 7; i++)
+                {
+                    int weekday = (startday + i - 1) % 7 + 1; // 1~7
+                    if (weekday == 6 || weekday == 7) continue;
+
+                    for (int j = 0; j < schedules.Length; j++)
+                    {
+                        // 이미 지각한 경우는 건너뛰기
+                        if (late[j]) continue;
+
+                        int log = timelogs[j, i]; 
+                        if (log - schedules[j] > 10)
                         {
-                            nextMonthGifts[i]++;
-                        }
-                        else if (giveCount[i, j] == giveCount[j, i])
-                        {
-                            if (giftIndex[i] > giftIndex[j])
-                                nextMonthGifts[i]++;
+                            late[j] = true;
                         }
                     }
                 }
 
-                return nextMonthGifts.Max();
+                for (int i = 0; i < late.Length; i++)
+                {
+                    if (!late[i]) answer++;
+                }
+                return answer;
             }
+
+            public int GetTime(int hhmm)
+            {
+                return (hhmm / 100) * 60 + (hhmm % 100);
+            }
+
+            public int[] GetRow(int[,] arr, int rowIndex)
+            {
+                int cols = arr.GetLength(1);
+                int[] row = new int[cols];
+                for (int j = 0; j < cols; j++)
+                {
+                    row[j] = arr[rowIndex, j];
+                }
+                return row;
+            }
+
         }
     }
 }
