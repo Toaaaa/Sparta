@@ -13,68 +13,38 @@ namespace code
 
         public class Solution
         {
-            public int solution(int[] schedules, int[,] timelogs, int startday)
+            public string[] solution(string[] players, string[] callings)
             {
-                int answer = 0;
-                bool[] late = new bool[schedules.Length];
-
-                // schedules HHMM -> 분 변환
-                for (int i = 0; i < schedules.Length; i++)
+                // players 배열을 각 Dictionary 전환
+                Dictionary<string, int> playerIndex = new Dictionary<string, int>();
+                Dictionary<int, string> playerRank = new Dictionary<int, string>();
+                for (int i = 0; i < players.Length; i++)
                 {
-                    schedules[i] = GetTime(schedules[i]);
+                    playerIndex[players[i]] = i;
+                }
+                for (int i = 0; i < players.Length; i++)
+                {
+                    playerRank[i] = players[i];
                 }
 
-                // timelogs HHMM -> 분 변환
-                for (int i = 0; i < timelogs.GetLength(0); i++)
+                // callings 배열을 순회하며 선수의 순위를 변경
+                for (int i = 0; i < callings.Length; i++)
                 {
-                    int[] row = GetRow(timelogs, i);
-                    for (int j = 0; j < row.Length; j++)
-                    {
-                        timelogs[i, j] = GetTime(row[j]);
-                    }
+                    // 추월 전 선수의 순위
+                    int before = playerIndex[callings[i]];
+                    // 추월 당하는 선수의 이름
+                    string loser = playerRank[before - 1];
+                    // 순위 변경 (playerIndex 업데이트)
+                    playerIndex[callings[i]] = before - 1;
+                    playerIndex[loser] = before;
+                    // 순위 변경 후 playerRank 업데이트
+                    playerRank[before - 1] = callings[i];
+                    playerRank[before] = loser;
                 }
-
-                for (int i = 0; i < 7; i++)
-                {
-                    int weekday = (startday + i - 1) % 7 + 1; // 1~7
-                    if (weekday == 6 || weekday == 7) continue;
-
-                    for (int j = 0; j < schedules.Length; j++)
-                    {
-                        // 이미 지각한 경우는 건너뛰기
-                        if (late[j]) continue;
-
-                        int log = timelogs[j, i]; 
-                        if (log - schedules[j] > 10)
-                        {
-                            late[j] = true;
-                        }
-                    }
-                }
-
-                for (int i = 0; i < late.Length; i++)
-                {
-                    if (!late[i]) answer++;
-                }
+                // 변경이 끝난 Dictionary를 배열로 전환
+                string[] answer = playerRank.Values.ToArray();
                 return answer;
             }
-
-            public int GetTime(int hhmm)
-            {
-                return (hhmm / 100) * 60 + (hhmm % 100);
-            }
-
-            public int[] GetRow(int[,] arr, int rowIndex)
-            {
-                int cols = arr.GetLength(1);
-                int[] row = new int[cols];
-                for (int j = 0; j < cols; j++)
-                {
-                    row[j] = arr[rowIndex, j];
-                }
-                return row;
-            }
-
         }
     }
 }
