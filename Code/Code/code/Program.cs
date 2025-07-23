@@ -8,42 +8,67 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/388351
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/389478
         /// </summary>
 
         public class Solution
         {
-            public string[] solution(string[] players, string[] callings)
+            public int solution(int n, int w, int num)
             {
-                // players 배열을 각 Dictionary 전환
-                Dictionary<string, int> playerIndex = new Dictionary<string, int>();
-                Dictionary<int, string> playerRank = new Dictionary<int, string>();
-                for (int i = 0; i < players.Length; i++)
+                int h = (int)Math.Ceiling(n / (double)w); // 전체 행 수
+                int[,] boxes = new int[h, w];
+
+                int curr = 1;
+                for (int row = 0; row < h; row++)
                 {
-                    playerIndex[players[i]] = i;
-                }
-                for (int i = 0; i < players.Length; i++)
-                {
-                    playerRank[i] = players[i];
+                    if (row % 2 == 0) // 왼 → 오
+                    {
+                        for (int col = 0; col < w; col++)
+                        {
+                            if (curr > n) boxes[row, col] = 0;
+                            else boxes[row, col] = curr++;
+                        }
+                    }
+                    else // 오 → 왼
+                    {
+                        for (int col = w - 1; col >= 0; col--)
+                        {
+                            if (curr > n) boxes[row, col] = 0;
+                            else boxes[row, col] = curr++;
+                        }
+                    }
                 }
 
-                // callings 배열을 순회하며 선수의 순위를 변경
-                for (int i = 0; i < callings.Length; i++)
+                // num 위치 찾기
+                int targetRow = -1;
+                int targetCol = -1;
+                for (int row = 0; row < h; row++)
                 {
-                    // 추월 전 선수의 순위
-                    int before = playerIndex[callings[i]];
-                    // 추월 당하는 선수의 이름
-                    string loser = playerRank[before - 1];
-                    // 순위 변경 (playerIndex 업데이트)
-                    playerIndex[callings[i]] = before - 1;
-                    playerIndex[loser] = before;
-                    // 순위 변경 후 playerRank 업데이트
-                    playerRank[before - 1] = callings[i];
-                    playerRank[before] = loser;
+                    for (int col = 0; col < w; col++)
+                    {
+                        if (boxes[row, col] == num)
+                        {
+                            targetRow = row;
+                            targetCol = col;
+                            break;
+                        }
+                    }
+                    if (targetRow != -1) break;
                 }
-                // 변경이 끝난 Dictionary를 배열로 전환
-                string[] answer = playerRank.Values.ToArray();
-                return answer;
+
+                // 끝에서부터 열을 스캔
+                int count = 0;
+                for (int row = h - 1; row >= 0; row--)
+                {
+                    if (boxes[row, targetCol] != 0)
+                    {
+                        count++;
+                        if (boxes[row, targetCol] == num)
+                            break;
+                    }
+                }
+
+                return count;
             }
         }
     }
