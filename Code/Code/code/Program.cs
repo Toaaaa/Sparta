@@ -8,67 +8,75 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/389478
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/42862
         /// </summary>
 
         public class Solution
         {
-            public int solution(int n, int w, int num)
+            public int solution(int n, int[] lost, int[] reserve)
             {
-                int h = (int)Math.Ceiling(n / (double)w); // 전체 행 수
-                int[,] boxes = new int[h, w];
+                int answer = 0;
+                List<bool> wearhave = new List<bool>(new bool[n]);
+                List<bool> reservehave = new List<bool>(new bool[n]);
 
-                int curr = 1;
-                for (int row = 0; row < h; row++)
+                for(int i = 0; i < n; i++) wearhave[i] = true; //다 있다고 가정
+                foreach (int i in lost) wearhave[i - 1] = false; // 그 중 없는 경우 표시
+                foreach (int i in reserve) reservehave[i - 1] = true; // 여벌이 있는 경우 표시
+
+                for(int i= 0; i < wearhave.Count; i++)
                 {
-                    if (row % 2 == 0) // 왼 → 오
+                    // 만약 현재 학생이 "체육복 or 여분"을 가지고 있다면
+                    if (wearhave[i] || reservehave[i])
                     {
-                        for (int col = 0; col < w; col++)
-                        {
-                            if (curr > n) boxes[row, col] = 0;
-                            else boxes[row, col] = curr++;
-                        }
+                        answer++;
+                        continue;
                     }
-                    else // 오 → 왼
+                    // 만약 현재 학생이 "체육복 & 여분"을 가지고 있지 않다면
+                    if (!wearhave[i])
                     {
-                        for (int col = w - 1; col >= 0; col--)
+                        // 양옆의 낮은사람 => 높은사람 순으로 확인하고, 가지고 있는 사람중 낮은 번호의 사람에게 빌린다
+                        if (i > 0)
                         {
-                            if (curr > n) boxes[row, col] = 0;
-                            else boxes[row, col] = curr++;
+                            if(i == n - 1) // i 가 마지막 순번인 경우
+                            {
+                                // 낮은 쪽만 확인
+                                if (wearhave[i -1] && reservehave[i - 1])
+                                {
+                                    wearhave[i] = true; // 빌림
+                                    reservehave[i - 1] = false; // 여벌이 있는 사람은 여벌을 잃음
+                                    answer++;
+                                }
+                            }
+                            else 
+                            {
+                                // 양옆 확인
+                                if (wearhave[i - 1] && reservehave[i - 1]) // 왼쪽 사람이 여벌이 있는 경우
+                                {
+                                    wearhave[i] = true; // 빌림
+                                    reservehave[i - 1] = false; // 여벌이 있는 사람은 여벌을 잃음
+                                    answer++;
+                                }
+                                else if (wearhave[i + 1] && reservehave[i + 1]) // 오른쪽 사람이 여벌이 있는 경우
+                                {
+                                    wearhave[i] = true; // 빌림
+                                    reservehave[i + 1] = false; // 여벌이 있는 사람은 여벌을 잃음
+                                    answer++;
+                                }
+                            }
+                        }
+                        else // i 가 0번인 경우
+                        {
+                            if (wearhave[1] && reservehave[1])
+                            {
+                                wearhave[i] = true; // 빌림
+                                reservehave[1] = false; // 여벌이 있는 사람은 여벌을 잃음
+                                answer++;
+                            }
                         }
                     }
                 }
 
-                // num 위치 찾기
-                int targetRow = -1;
-                int targetCol = -1;
-                for (int row = 0; row < h; row++)
-                {
-                    for (int col = 0; col < w; col++)
-                    {
-                        if (boxes[row, col] == num)
-                        {
-                            targetRow = row;
-                            targetCol = col;
-                            break;
-                        }
-                    }
-                    if (targetRow != -1) break;
-                }
-
-                // 끝에서부터 열을 스캔
-                int count = 0;
-                for (int row = h - 1; row >= 0; row--)
-                {
-                    if (boxes[row, targetCol] != 0)
-                    {
-                        count++;
-                        if (boxes[row, targetCol] == num)
-                            break;
-                    }
-                }
-
-                return count;
+                return answer;
             }
         }
     }
