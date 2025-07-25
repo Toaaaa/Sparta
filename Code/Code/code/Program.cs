@@ -8,50 +8,46 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/42578
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/118667
         /// </summary>
 
         public class Solution
         {
-            public int solution(string[,] clothes)
+            public long solution(int[] queue1, int[] queue2)
             {
-                int answer = 1;
-                HashSet<string> types = new HashSet<string>(); // 옷의 종류
-                Dictionary<string, int> typeCount = new Dictionary<string, int>(); // 옷 종류별 개수
+                Queue<int> q1 = new Queue<int>(queue1);
+                Queue<int> q2 = new Queue<int>(queue2);
+                long answer = 0;
+                long diff = 0; // queue1가 더 큰만큼 +, 작으면 - 로 표시. diff 가 0이면 둘의 합이 같아지는 순간.
+                long sum1 = queue1.Select(x => (long)x).Sum();
+                long sum2 = queue2.Select(x => (long)x).Sum();
 
-                for(int i = 0; i < clothes.GetLength(0); i++)
-                {
-                    string type = clothes[i, 1];
-                    types.Add(type);
-                    
-                    if (typeCount.ContainsKey(type))
-                    {
-                        typeCount[type]++;
-                    }
-                    else
-                    {
-                        typeCount[type] = 1;
-                    }
-                }
+                diff = (sum1 - sum2); // 두 큐의 합이 같아지는 순간을 찾기 위해서.
 
-                if(types.Count == 1)
+                // 두 수의 합의 홀수는 불가능한 경우.
+                if((sum1 + sum2) % 2 != 0) return -1;
+
+                while (diff != 0)
                 {
-                    // 옷 종류가 하나뿐인 경우
-                    answer = typeCount[types.First()];
-                }
-                else
-                {
-                    // 옷 종류가 여러개일 경우 조합식 계산 - 아무것도 안입은 경우(1개)
-                    var type = types.ToArray();
-                    foreach (var t in type)
+                    if(diff > 0) // queue1이 더 크면 queue1에서 하나 꺼내서 queue2에 넣음.
                     {
-                        // 2가지인 경우 => 0, 1, 2 개중 하나를 선택한다고 했을때 +1을 해준다.
-                        answer *= (typeCount[t] + 1);
+                        answer++; // 큐를 옮길 때마다 카운트 증가.
+                        if(q1.Count == 0) return -1; // queue1이 비어있으면 불가능한 경우.
+                        int num = q1.Dequeue();
+                        q2.Enqueue(num);
+                        diff -= (long)num * 2; // queue1에서 꺼낸 수를 두 번 빼줌.
+                    }
+                    else // queue2가 더 크면 queue2에서 하나 꺼내서 queue1에 넣음.
+                    {
+                        answer++; // 큐를 옮길 때마다 카운트 증가.
+                        if(q2.Count == 0) return -1; // queue2가 비어있으면 불가능한 경우.
+                        int num = q2.Dequeue();
+                        q1.Enqueue(num);
+                        diff += (long)num * 2; // queue2에서 꺼낸 수를 두 번 더해줌.
                     }
 
-                    answer--;
+                    if(answer > (queue1.Length + queue2.Length) *2) return -1;
                 }
-                
                 return answer;
             }
         }
