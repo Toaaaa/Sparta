@@ -8,74 +8,50 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/42862
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/42578
         /// </summary>
 
         public class Solution
         {
-            public int solution(int n, int[] lost, int[] reserve)
+            public int solution(string[,] clothes)
             {
-                int answer = 0;
-                List<bool> wearhave = new List<bool>(new bool[n]);
-                List<bool> reservehave = new List<bool>(new bool[n]);
+                int answer = 1;
+                HashSet<string> types = new HashSet<string>(); // 옷의 종류
+                Dictionary<string, int> typeCount = new Dictionary<string, int>(); // 옷 종류별 개수
 
-                for(int i = 0; i < n; i++) wearhave[i] = true; //다 있다고 가정
-                foreach (int i in lost) wearhave[i - 1] = false; // 그 중 없는 경우 표시
-                foreach (int i in reserve) reservehave[i - 1] = true; // 여벌이 있는 경우 표시
-
-                for(int i= 0; i < wearhave.Count; i++)
+                for(int i = 0; i < clothes.GetLength(0); i++)
                 {
-                    // 만약 현재 학생이 "체육복 or 여분"을 가지고 있다면
-                    if (wearhave[i] || reservehave[i])
+                    string type = clothes[i, 1];
+                    types.Add(type);
+                    
+                    if (typeCount.ContainsKey(type))
                     {
-                        answer++;
-                        continue;
+                        typeCount[type]++;
                     }
-                    // 만약 현재 학생이 "체육복 & 여분"을 가지고 있지 않다면
-                    if (!wearhave[i])
+                    else
                     {
-                        // 양옆의 낮은사람 => 높은사람 순으로 확인하고, 가지고 있는 사람중 낮은 번호의 사람에게 빌린다
-                        if (i > 0)
-                        {
-                            if(i == n - 1) // i 가 마지막 순번인 경우
-                            {
-                                // 낮은 쪽만 확인
-                                if (wearhave[i -1] && reservehave[i - 1])
-                                {
-                                    wearhave[i] = true; // 빌림
-                                    reservehave[i - 1] = false; // 여벌이 있는 사람은 여벌을 잃음
-                                    answer++;
-                                }
-                            }
-                            else 
-                            {
-                                // 양옆 확인
-                                if (wearhave[i - 1] && reservehave[i - 1]) // 왼쪽 사람이 여벌이 있는 경우
-                                {
-                                    wearhave[i] = true; // 빌림
-                                    reservehave[i - 1] = false; // 여벌이 있는 사람은 여벌을 잃음
-                                    answer++;
-                                }
-                                else if (wearhave[i + 1] && reservehave[i + 1]) // 오른쪽 사람이 여벌이 있는 경우
-                                {
-                                    wearhave[i] = true; // 빌림
-                                    reservehave[i + 1] = false; // 여벌이 있는 사람은 여벌을 잃음
-                                    answer++;
-                                }
-                            }
-                        }
-                        else // i 가 0번인 경우
-                        {
-                            if (wearhave[1] && reservehave[1])
-                            {
-                                wearhave[i] = true; // 빌림
-                                reservehave[1] = false; // 여벌이 있는 사람은 여벌을 잃음
-                                answer++;
-                            }
-                        }
+                        typeCount[type] = 1;
                     }
                 }
 
+                if(types.Count == 1)
+                {
+                    // 옷 종류가 하나뿐인 경우
+                    answer = typeCount[types.First()];
+                }
+                else
+                {
+                    // 옷 종류가 여러개일 경우 조합식 계산 - 아무것도 안입은 경우(1개)
+                    var type = types.ToArray();
+                    foreach (var t in type)
+                    {
+                        // 2가지인 경우 => 0, 1, 2 개중 하나를 선택한다고 했을때 +1을 해준다.
+                        answer *= (typeCount[t] + 1);
+                    }
+
+                    answer--;
+                }
+                
                 return answer;
             }
         }
