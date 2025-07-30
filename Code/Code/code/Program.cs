@@ -8,60 +8,60 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/42746
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/152996
         /// </summary>
 
         public class Solution
         {
-            public int solution(int n, int[,] wires)
+            public long solution(int[] weights)
             {
-                int minDif = int.MaxValue;
+                long answer = 0;
+                var count = new Dictionary<int, long>();
 
-                for (int i = 0; i < wires.GetLength(0); i++)
+                foreach (int w in weights)
                 {
-                    // 1. 인접 리스트 초기화
-                    List<int>[] graph = new List<int>[n + 1];
-                    for (int j = 0; j <= n; j++)
-                        graph[j] = new List<int>();
+                    if (!count.ContainsKey(w)) count[w] = 0;
 
-                    // 2. 전선 i를 끊고, 나머지는 그래프 구성
-                    for (int j = 0; j < wires.GetLength(0); j++)
-                    {
-                        if (j == i) continue; // i번째 전선을 끊음
-
-                        int a = wires[j, 0];
-                        int b = wires[j, 1];
-                        graph[a].Add(b);
-                        graph[b].Add(a);
-                    }
-
-                    // 3. 임의의 노드에서 시작하여 연결된 송전탑 수 계산
-                    bool[] visited = new bool[n + 1];
-                    int groupCount = DFS(1, graph, visited); // 1번 송전탑부터 탐색
-
-                    // 4. 나머지 송전탑은 n - groupCount
-                    int diff = Math.Abs(groupCount - (n - groupCount));
-                    minDif = Math.Min(minDif, diff);
+                    count[w]++;
                 }
 
-                return minDif;
-            }
-
-            int DFS(int node, List<int>[] graph, bool[] visited)
-            {
-                visited[node] = true;
-                int count = 1;
-
-                foreach (int neighbor in graph[node])
+                var ratios = new Tuple<int, int>[]
                 {
-                    if (!visited[neighbor])
+                    Tuple.Create(1, 1),
+                    Tuple.Create(2, 3),
+                    Tuple.Create(3, 4),
+                    Tuple.Create(1, 2),
+                    Tuple.Create(3, 2),
+                    Tuple.Create(4, 3),
+                };
+
+
+                foreach (var ratio in ratios)
+                {
+                    int a = ratio.Item1;
+                    int b = ratio.Item2;
+
+                    foreach (int w in count.Keys)
                     {
-                        count += DFS(neighbor, graph, visited);
+                        long wCount = count[w];
+                        if ((w * b) % a != 0) continue; // 불가능한 케이스 건너뛰기
+
+                        int target = (w * b) / a;
+                        if (!count.ContainsKey(target)) continue; // 등록된 값에 없으면 건너뛰기
+
+                        if (w == target)
+                        {
+                            answer += wCount * (wCount - 1) / 2;
+                        }
+                        else if (w < target)
+                        {
+                            answer += wCount * count[target];
+                        }
                     }
                 }
-                return count;
-            }
 
+                return answer;
+            }
         }
     }
 }
