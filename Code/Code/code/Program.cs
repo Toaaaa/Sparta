@@ -12,39 +12,76 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/42883
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/135807
         /// </summary>
 
         public class Solution
         {
-            public string solution(string number, int k)
+            public int solution(int[] arrayA, int[] arrayB)
             {
-                Stack<char> stack = new Stack<char>();
+                int answer = 0;
+                HashSet<int> setA = new HashSet<int>();
+                HashSet<int> setB = new HashSet<int>();
+                arrayA = arrayA.OrderBy(x => x).ToArray();
+                arrayB = arrayB.OrderBy(x => x).ToArray();
 
-                foreach (char c in number)
+
+                GetDiv(arrayA[0], setA);
+                GetDiv(arrayB[0], setB);
+
+                for (int i = 1; i < arrayA.Length; i++)
                 {
-                    while (stack.Count > 0 && k > 0 && stack.Peek() < c)
+                    foreach (var item in setA.ToArray())
                     {
-                        stack.Pop();
-                        k--;
+                        if (arrayA[i] % item != 0)
+                            setA.Remove(item);
                     }
-                    stack.Push(c);
-                }
-                while (k > 0)
-                {
-                    stack.Pop();
-                    k--;
+                    foreach (var item in setB.ToArray())
+                    {
+                        if (arrayB[i] % item != 0)
+                            setB.Remove(item);
+                    }
                 }
 
-                var result = stack.Reverse(); // Stack은 뒤집기
-                return string.Concat(result); // << 문자열을 하나하나 더하기 보다 Concat을 사용하는것이 성능상 유리
+                // 크로스 체크
+                int maxA = 0;
+                foreach (var div in setA)
+                {
+                    if (arrayB.All(x => x % div != 0))
+                        maxA = Math.Max(maxA, div);
+                }
+
+                int maxB = 0;
+                foreach (var div in setB)
+                {
+                    if (arrayA.All(x => x % div != 0))
+                        maxB = Math.Max(maxB, div);
+                }
+
+                answer = Math.Max(maxA, maxB);
+                return answer;
             }
 
-        static void Main(string[] args)
-        {
-            Solution solution = new Solution();
-            string ans = solution.solution("4177252814", 4);
-            Console.WriteLine(string.Join(", ", ans));
+
+            public void GetDiv(int num,HashSet<int> h)
+            {
+                for (int i = 1; i * i <= num; i++)
+                {
+                    if (num % i == 0)
+                    {
+                        h.Add(i);
+                        h.Add(num / i);
+                    }
+                }
+            }
+
+
+            static void Main(string[] args)
+            {
+                Solution solution = new Solution();
+                int ans = solution.solution([12, 16], [6, 18]);
+                Console.WriteLine(ans);
+            }
         }
     }
 }
