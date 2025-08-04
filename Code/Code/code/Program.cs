@@ -12,74 +12,43 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/135807
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/389479
         /// </summary>
 
         public class Solution
         {
-            public int solution(int[] arrayA, int[] arrayB)
+            public int solution(int[] players, int m, int k)
             {
-                int answer = 0;
-                HashSet<int> setA = new HashSet<int>();
-                HashSet<int> setB = new HashSet<int>();
-                arrayA = arrayA.OrderBy(x => x).ToArray();
-                arrayB = arrayB.OrderBy(x => x).ToArray();
-
-
-                GetDiv(arrayA[0], setA);
-                GetDiv(arrayB[0], setB);
-
-                for (int i = 1; i < arrayA.Length; i++)
+                
+                Queue<int> serverQ = new Queue<int>();
+                int currentServer = 0;
+                int cumuSever = 0;
+                for(int i = 0; i < players.Length; i++)
                 {
-                    foreach (var item in setA.ToArray())
+                    // 유지 시간 이후부터는 계속 시간 지난 서버 제거
+                    if (i - k >= 0) currentServer -= serverQ.Dequeue();
+
+                    int total = 0;
+                    // 총 유저수가 서버의 가용량을 넘어설때
+                    if (players[i] >= (currentServer+1) * m)
                     {
-                        if (arrayA[i] % item != 0)
-                            setA.Remove(item);
+                        while (players[i] >= (currentServer + 1) * m)
+                        {
+                            currentServer++;
+                            cumuSever++;
+                            total++;
+                        }
                     }
-                    foreach (var item in setB.ToArray())
-                    {
-                        if (arrayB[i] % item != 0)
-                            setB.Remove(item);
-                    }
+                    serverQ.Enqueue(total);
                 }
-
-                // 크로스 체크
-                int maxA = 0;
-                foreach (var div in setA)
-                {
-                    if (arrayB.All(x => x % div != 0))
-                        maxA = Math.Max(maxA, div);
-                }
-
-                int maxB = 0;
-                foreach (var div in setB)
-                {
-                    if (arrayA.All(x => x % div != 0))
-                        maxB = Math.Max(maxB, div);
-                }
-
-                answer = Math.Max(maxA, maxB);
-                return answer;
-            }
-
-
-            public void GetDiv(int num,HashSet<int> h)
-            {
-                for (int i = 1; i * i <= num; i++)
-                {
-                    if (num % i == 0)
-                    {
-                        h.Add(i);
-                        h.Add(num / i);
-                    }
-                }
+                return cumuSever;
             }
 
 
             static void Main(string[] args)
             {
                 Solution solution = new Solution();
-                int ans = solution.solution([12, 16], [6, 18]);
+                int ans = solution.solution([0, 2, 3, 3, 1, 2, 0, 0, 0, 0, 4, 2, 0, 6, 0, 4, 2, 13, 3, 5, 10, 0, 1, 5], 3,5);
                 Console.WriteLine(ans);
             }
         }
