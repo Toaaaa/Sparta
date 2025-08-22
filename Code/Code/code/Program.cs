@@ -12,33 +12,26 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/12981
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/12980
         /// </summary>
 
         public class Solution
         {
-            public int[] solution(int n, string[] words)
+            public int solution(int n)
             {
-                int[] answer = {0, 0};
-                HashSet<string> usedWords = new HashSet<string>();
-                int num = 0;
-                int count = 0;
+                int answer = 0;
+                answer++;
 
-                for (int i = 0; i < words.Length; i++)
+                while (n > 1)
                 {
-                    num = (i + 1) % n;
-                    count = i / n;
-                    if (num == 0) num = n;
-
-                    // 이미 사용한 단어 or 단어 끝이 안맞는 경우 
-                    if (usedWords.Contains(words[i]) || 
-                        (i > 0 && words[i][0] != words[i - 1][words[i-1].Length -1]))
+                    if(n % 2 == 0)
                     {
-                        return new int[] {num, count + 1};
+                        n /= 2;
                     }
                     else
                     {
-                        usedWords.Add(words[i]);
+                        n -= 1;
+                        answer++;
                     }
                 }
 
@@ -48,10 +41,9 @@ namespace code
             static void Main(string[] args)
             {
                 Solution solution = new Solution();
-                string[] words = new string[] { "tank", "kick", "know", "wheel", "land", "dream", "mother", "robot", "tank" };
 
-                int[] answer = solution.solution(3,words);
-                Console.WriteLine($"[{string.Join(", ", answer)}]");
+                int answer = solution.solution(5000);
+                Console.WriteLine(answer);
             }
         }
     }
