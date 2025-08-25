@@ -12,81 +12,55 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/49994
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/1844
         /// </summary>
 
         public class Solution
         {
-            public int solution(string dirs)
+            public int solution(int[,] maps)
             {
-                Tuple<int, int> current = new Tuple<int, int>(0, 0);
-                HashSet<Tuple<int, int, string>> visited = new HashSet<Tuple<int, int, string>>();
+                int n = maps.GetLength(0);
+                int m = maps.GetLength(1);
 
-                for(int i = 0; i < dirs.Length; i++)
+                int[,] visited = new int[n, m]; // 이동 횟수를 기록하는 배열
+                Queue<(int x, int y)> q = new Queue<(int, int)>();
+                q.Enqueue((0, 0));
+                visited[0, 0] = 1;
+
+                int[] dx = new int[] { 0, 0, 1, -1 }; // 상하우좌
+                int[] dy = new int[] { 1, -1, 0, 0 }; // 상하우좌
+
+                while (q.Count > 0)
                 {
-                    char direction = dirs[i];
-                    switch (direction)
+                    var (x, y) = q.Dequeue();
+
+                    for (int dir = 0; dir < 4; dir++)
                     {
-                        case 'U':
-                            if(current.Item1 < 5)
+                        int nx = x + dx[dir];
+                        int ny = y + dy[dir];
+
+                        if (nx >= 0 && ny >= 0 && nx < n && ny < m)
+                        {
+                            if (maps[nx, ny] == 1 && visited[nx, ny] == 0)
                             {
-                                var next = new Tuple<int, int>(current.Item1 + 1, current.Item2);
-                                if (!visited.Contains(new Tuple<int, int, string>(current.Item1, current.Item2, "U")) && 
-                                    !visited.Contains(new Tuple<int, int, string>(next.Item1, next.Item2, "D")))
-                                {
-                                    visited.Add(new Tuple<int, int, string>(current.Item1, current.Item2, "U"));
-                                }
-                                current = next;
+                                visited[nx, ny] = visited[x, y] + 1;
+                                q.Enqueue((nx, ny));
                             }
-                            break;
-                        case 'D':
-                            if(current.Item1 > -5)
-                            {
-                                var next = new Tuple<int, int>(current.Item1 - 1, current.Item2);
-                                if (!visited.Contains(new Tuple<int, int, string>(current.Item1, current.Item2, "D")) && 
-                                    !visited.Contains(new Tuple<int, int, string>(next.Item1, next.Item2, "U")))
-                                {
-                                    visited.Add(new Tuple<int, int, string>(current.Item1, current.Item2, "D"));
-                                }
-                                current = next;
-                            }
-                            break;
-                        case 'L':
-                            if(current.Item2 > -5)
-                            {
-                                var next = new Tuple<int, int>(current.Item1, current.Item2 - 1);
-                                if (!visited.Contains(new Tuple<int, int, string>(current.Item1, current.Item2, "L")) && 
-                                    !visited.Contains(new Tuple<int, int, string>(next.Item1, next.Item2, "R")))
-                                {
-                                    visited.Add(new Tuple<int, int, string>(current.Item1, current.Item2, "L"));
-                                }
-                                current = next;
-                            }
-                            break;
-                        case 'R':
-                            if(current.Item2 < 5)
-                            {
-                                var next = new Tuple<int, int>(current.Item1, current.Item2 + 1);
-                                if (!visited.Contains(new Tuple<int, int, string>(current.Item1, current.Item2, "R")) && 
-                                    !visited.Contains(new Tuple<int, int, string>(next.Item1, next.Item2, "L")))
-                                {
-                                    visited.Add(new Tuple<int, int, string>(current.Item1, current.Item2, "R"));
-                                }
-                                current = next;
-                            }
-                            break;
+                        }
                     }
                 }
-                return visited.Count;
+
+                return visited[n - 1, m - 1] == 0 ? -1 : visited[n - 1, m - 1];
+                // queue를 다 돌렸는데도 도착지점에 도달 못했으면 -1 리턴 그게 아니면 이동 횟수 리턴.
             }
 
             static void Main(string[] args)
             {
                 Solution solution = new Solution();
-                string dirs = "ULURRDLLU";
+                //string dirs = "ULURRDLLU";
 
-                int answer = solution.solution(dirs);
-                Console.WriteLine(answer);
+                //int answer = solution.solution(dirs);
+                //Console.WriteLine(answer);
             }
         }
     }
