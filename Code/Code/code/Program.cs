@@ -13,109 +13,44 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/42628
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/49993
         /// </summary>
 
         public class Solution
         {
-            public int[] solution(string[] operations)
+            public int solution(string skill, string[] skill_trees)
             {
-                int[] answer = new int[] { };
-                List<int> nums = new List<int>();
-                Dictionary<int, int> dict = new Dictionary<int, int>();
-                Stack<int> maxHeap = new Stack<int>();
-                Stack<int> minHeap = new Stack<int>();
+                int answer = 0;
+                Queue<char> skillQueue = new Queue<char>(skill.ToCharArray());
+                Queue<char> tempQueue = new Queue<char>();
 
-                for(int i = 0; i < operations.Length; i++)
+                for (int i = 0; i < skill_trees.Length; i++)
                 {
-                    switch (operations[i])
+                    answer++;
+                    tempQueue = new Queue<char>(skillQueue);
+                    for(int j =0; j < skill_trees[i].Length; j++)
                     {
-                        case "D 1":
-                            
-                            break;
-                        case "D -1":
-                            
-                            break;
-                        default: // "I 숫자"
-                            int num = int.Parse(operations[i].Split(' ')[1]);
-                            if (dict.ContainsKey(num)) dict[num]++;
-                            else dict.Add(num, 1);
-
-                            if(num >= maxHeap.Peek()) maxHeap.Push(num);
-                            if(num <= minHeap.Peek()) maxHeap.Push(num);
-
-                            break;
+                        // 다음 진행 스킬이, 스킬 트리에 포함된 스킬인 경우
+                        if (skill.Contains(skill_trees[i][j]))
+                        {
+                            if (tempQueue.Count > 0 && skill_trees[i][j] == tempQueue.Peek())
+                                tempQueue.Dequeue();
+                            else
+                            {
+                                answer--;
+                                break;
+                            }
+                        }
                     }
                 }
                 return answer;
-            }
-
-            public int[] solution2(string[] operations)
-            {
-                int[] answer = new int[] { };
-                Queue<int> heaps = new Queue<int>(); // 내림차순 정렬
-
-                for (int i = 0; i < operations.Length; i++)
-                {
-                    switch (operations[i])
-                    {
-                        case "D 1":
-                            if(heaps.Count > 0)
-                                heaps.Dequeue();
-                            break;
-                        case "D -1":
-                            if(heaps.Count > 0)
-                            {
-                                Queue<int> temps = new Queue<int>();
-                                while (heaps.Count > 1)
-                                    temps.Enqueue(heaps.Dequeue());
-                                heaps.Dequeue();
-                                heaps = temps;
-                            }
-                            break;
-                        default: // "I 숫자"
-                            int num = int.Parse(operations[i].Split(' ')[1]);
-                            Queue<int> temp = new Queue<int>();
-
-                            if (heaps.Count == 0)
-                                heaps.Enqueue(num);
-                            else if (heaps.Peek() <= num)
-                            { 
-                                temp.Clear();
-
-                                temp.Enqueue(num);
-                                while (heaps.Count > 0)
-                                    temp.Enqueue(heaps.Dequeue());  
-                                heaps = temp;
-                            }
-                            else
-                            {
-                                temp.Clear();
-
-                                while (heaps.Count > 0 && heaps.Peek() >= num)
-                                    temp.Enqueue(heaps.Dequeue());
-
-                                temp.Enqueue(num);
-
-                                while (heaps.Count > 0)
-                                    temp.Enqueue(heaps.Dequeue());
-
-                                heaps = temp;
-                            }
-
-                            break;
-                    }
-                }
-                if (heaps.Count == 0) return new int[] { 0, 0 };
-                if (heaps.Count == 1) return new int[] { heaps.Peek(), heaps.Peek() };
-                return new int[] { heaps.Peek(), heaps.Last() };
             }
 
             static void Main(string[] args)
             {
                 Solution solution = new Solution();
 
-                //int answer = solution.solution([5, 4, 3, 2, 1]);
+                //int answer = solution.solution(437674,3);
                 //Console.WriteLine(answer);
             }
         }
