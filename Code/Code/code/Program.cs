@@ -14,51 +14,88 @@ namespace code
     internal class Program
     {
         /// <summary>
-        /// https://school.programmers.co.kr/learn/courses/30/lessons/42579
+        /// https://school.programmers.co.kr/learn/courses/30/lessons/12987
         /// </summary>
 
         public class Solution
         {
-            public int[] solution(string[] genres, int[] plays)
+            // 1. Dictionary 만 사용한 풀이
+            public int solution(int[] A, int[] B)
             {
-                int[] answer = new int[] { };
-                List<Tuple<string,int,int>> list = new List<Tuple<string,int,int>>(); // Tuple<장르 ,재생횟수, 고유번호>
-                Dictionary<string,int> genreDict = new Dictionary<string,int>(); // 장르별 총합 재생횟수
-                Dictionary<string, int> checkdDict = new Dictionary<string, int>(); // 장르별 누적 채택 횟수
-
-                for(int i = 0; i < genres.Length; i++)
+                int answer = 0;
+                Dictionary<int, int> dictA = new Dictionary<int, int>();
+                for(int i = 0; i < B.Length; i++)
                 {
-                    list.Add(new Tuple<string,int, int>(genres[i],plays[i], i));
+                    if (dictA.ContainsKey(B[i]))
+                        dictA[B[i]]++;
+                    else
+                        dictA.Add(B[i], 1);
+                }
+                for (int i = 0; i < A.Length; i++)
+                {
+                    if (dictA.Count == 0) break;
 
-                    if (genreDict.ContainsKey(genres[i]))
-                        genreDict[genres[i]] += plays[i];
+                    var key = dictA.Keys.FirstOrDefault(k => k > A[i]);
+
+                    if (key == 0) dictA.Remove(dictA.Keys.First()); // A[i]보다 큰 값이 없으면 가장 작은 값 대입
                     else
                     {
-                        genreDict.Add(genres[i], plays[i]);
-                        checkdDict.Add(genres[i], 2);
+                        answer++;
+                        if (dictA[key] == 1)
+                            dictA.Remove(key);
+                        else
+                            dictA[key]--;
                     }
                 }
-                list.Sort((a, b) => b.Item2.CompareTo(a.Item2)); // 재생횟수 내림차순 정렬
-                var sortedGenre = genreDict.OrderByDescending(x => x.Value).Select(x => x.Key).ToList(); // 장르별 재생횟수 내림차순으로 list에 받아오기
-
-
-                List<int> ans = new List<int>();
-                for (int i = 0; i < sortedGenre.Count; i++)
-                {
-                    for (int j = 0; j < genres.Length; j++)
-                    {
-                        if (list[j].Item1 == sortedGenre[i] && checkdDict[sortedGenre[i]] > 0)
-                        {
-                            ans.Add(list[j].Item3);
-                            checkdDict[sortedGenre[i]]--;
-                            if(checkdDict[sortedGenre[i]] == 0) break;
-                        }
-                    }
-                }
-
-                answer = ans.ToArray();
                 return answer;
             }
+
+
+            // 2. SortedDictionary + SortedSet 사용한 풀이 (시간 복잡도 고려)
+            public int solution2(int[] A, int[] B)
+            {
+                int answer = 0;
+                SortedDictionary<int, int> dictA = new SortedDictionary<int, int>();
+                SortedSet<int> keys = new SortedSet<int>();
+
+                for (int i = 0; i < B.Length; i++)
+                {
+                    if (dictA.ContainsKey(B[i]))
+                        dictA[B[i]]++;
+                    else
+                        dictA.Add(B[i], 1);
+
+                    keys.Add(B[i]);
+                }
+
+                for (int i = 0; i < A.Length; i++)
+                {
+                    if (dictA.Count == 0) break;
+
+                    int key;
+
+                    // A[i]보다 큰 값 찾기
+                    var view = keys.GetViewBetween(A[i] + 1, int.MaxValue);
+                    if (view.Count > 0)
+                    {
+                        key = view.Min;
+                        answer++;
+                    }
+                    else
+                        key = keys.Min; // A[i]보다 큰 값이 없으면 가장 작은 값 대입
+
+                    if (dictA[key] == 1)
+                    {
+                        dictA.Remove(key);
+                        keys.Remove(key);
+                    }
+                    else
+                        dictA[key]--;
+                }
+                return answer;
+            }
+
+
 
             static void Main(string[] args)
             {
